@@ -14,6 +14,8 @@ package gov.nist.hit.hl7.profile.validation.service;
 import java.io.IOException;
 import java.io.InputStream;
 
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport;
+
 /**
  * @author jungyubw
  *
@@ -21,9 +23,9 @@ import java.io.InputStream;
 public interface ValidationService {
 
 
-  public void validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr);
+  public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr);
   
   
-  public void validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException;
+  public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException;
 
 }

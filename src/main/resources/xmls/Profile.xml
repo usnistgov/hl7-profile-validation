@@ -1252,6 +1252,7 @@
             <DynamicMapping>
                 <Mapping Position="5" Reference="2">
                     <Case Value="XCN" Datatype="XCN_2-4"/>
+                    <Case Value="XCN" Datatype="XCN_2-4"/>
                     <Case Value="TX" Datatype="TX_2-4"/>
                     <Case Value="FT" Datatype="FT_ForDM20554_2-4"/>
                     <Case Value="DT" Datatype="DT_2-4"/>

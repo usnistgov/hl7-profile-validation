@@ -15,7 +15,7 @@ package gov.nist.hit.hl7.profile.validation.domain;
  * @author jungyubw
  *
  */
-public class ProfileError {
+public enum ErrorType {
 
-  
+  FiveLevelComponent, MissingValueSet, DuplicatedDynamicMapping, Unknown, CoreParsingError
 }

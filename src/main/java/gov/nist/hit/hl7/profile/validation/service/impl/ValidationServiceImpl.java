@@ -16,9 +16,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -26,10 +28,18 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import gov.nist.hit.hl7.profile.validation.domain.CustomProfileError;
+import gov.nist.hit.hl7.profile.validation.domain.DocumentTarget;
+import gov.nist.hit.hl7.profile.validation.domain.ErrorType;
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport;
 import gov.nist.hit.hl7.profile.validation.domain.XSDVerificationResult;
 import gov.nist.hit.hl7.profile.validation.service.ValidationService;
+import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
 import hl7.v2.profile.XMLDeserializer;
 
 /**
@@ -53,51 +63,178 @@ public class ValidationServiceImpl implements ValidationService {
    * gov.nist.hit.hl7.profile.validation.service.ValidationService#validationXMLs(java.lang.String,
    * java.lang.String, java.lang.String)
    */
-  public void validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
+  public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr,
+      String valuesetXMLStr) {
+    ProfileValidationReport report = new ProfileValidationReport();
     // 1. XML Validation by XSD
-    XSDVerificationResult profileXSDVerificationResult =
-        this.verifyXMLByXSD(profileXSDurl, profileXMLStr);
-    XSDVerificationResult valuesetXSDVerificationResult =
-        this.verifyXMLByXSD(valueSetXSDurl, valuesetXMLStr);
-    XSDVerificationResult constraintXSDVerificationResult =
-        this.verifyXMLByXSD(constraintXSDurl, constraintXMLStr);
+    report.setProfileXSDValidationResult(this.verifyXMLByXSD(profileXSDurl, profileXMLStr));
+    report.setValueSetXSDValidationResult(this.verifyXMLByXSD(valueSetXSDurl, valuesetXMLStr));
+    report
+        .setConstraintsXSDValidationResult(this.verifyXMLByXSD(constraintXSDurl, constraintXMLStr));
 
-    System.out.println(profileXSDVerificationResult);
-    System.out.println(valuesetXSDVerificationResult);
-    System.out.println(constraintXSDVerificationResult);
+    try {
+      Document profileDoc = XMLManager.stringToDom(profileXMLStr);
+      Document constrintsDoc = XMLManager.stringToDom(constraintXMLStr);
+      Document valuesetsDoc = XMLManager.stringToDom(valuesetXMLStr);
+
+      Element messagesElm = (Element) profileDoc.getElementsByTagName("Messages").item(0);
+      Element segmentsElm = (Element) profileDoc.getElementsByTagName("Segments").item(0);
+      Element datatypesElm = (Element) profileDoc.getElementsByTagName("Datatypes").item(0);
+
+      NodeList messages = messagesElm.getElementsByTagName("Message");
+      NodeList segments = segmentsElm.getElementsByTagName("Segment");
+      NodeList datatypes = datatypesElm.getElementsByTagName("Datatype");
+
+      HashMap<String, Element> messageMap = new HashMap<String, Element>();
+      HashMap<String, Element> segmentMap = new HashMap<String, Element>();
+      HashMap<String, Element> datatypeMap = new HashMap<String, Element>();
+
+      for (int i = 0; i < messages.getLength(); i++) {
+        Element m = (Element) messages.item(i);
+        messageMap.put(m.getAttribute("ID"), m);
+      }
+
+      for (int i = 0; i < segments.getLength(); i++) {
+        Element s = (Element) segments.item(i);
+        segmentMap.put(s.getAttribute("ID"), s);
+      }
+
+      for (int i = 0; i < datatypes.getLength(); i++) {
+        Element d = (Element) datatypes.item(i);
+        datatypeMap.put(d.getAttribute("ID"), d);
+      }
+      // 2. Checking 5 level Violation
+      for (String id : datatypeMap.keySet()) {
+        Element dtElm = datatypeMap.get(id);
+        NodeList components = dtElm.getElementsByTagName("Component");
+        for (int i = 0; i < components.getLength(); i++) {
+          Element componentElm = (Element) components.item(i);
+          String comnponentDTId = componentElm.getAttribute("Datatype");
+          Element componentDTElm = (Element) datatypeMap.get(comnponentDTId);
+          NodeList subComponents = componentDTElm.getElementsByTagName("Component");
+          for (int j = 0; j < subComponents.getLength(); j++) {
+            Element subComponentElm = (Element) subComponents.item(j);
+            String subComnponentDTId = subComponentElm.getAttribute("Datatype");
+            Element subComponentDTElm = (Element) datatypeMap.get(subComnponentDTId);
+
+            if (subComponentDTElm.getElementsByTagName("Component").getLength() > 0) {
+              report.addProfileError(new CustomProfileError(
+                  ErrorType.FiveLevelComponent, id + "." + (i + 1) + "." + (j + 1) + " Datatype is "
+                      + subComnponentDTId + ", but it is not primitive.",
+                  DocumentTarget.DATATYPE, subComnponentDTId));
+            }
+          }
+        }
+      }
+
+      // 3. Checking Dynamic Mapping
+      HashMap<String, Element> dmCaseMap = new HashMap<String, Element>();
+      for (String id : segmentMap.keySet()) {
+        Element segElm = segmentMap.get(id);
+        NodeList dmCases = segElm.getElementsByTagName("Case");
+
+        if (dmCases.getLength() > 0) {
+          for (int i = 0; i < dmCases.getLength(); i++) {
+            Element dmCaseElm = (Element) dmCases.item(i);
+            String key = dmCaseElm.getAttribute("Value");
+            if (dmCaseMap.containsKey(key)) {
+              report.addProfileError(new CustomProfileError(ErrorType.DuplicatedDynamicMapping,
+                  "Segment " + id + " has duplicated Dynamic mapping definition for " + key + ".",
+                  DocumentTarget.SEGMENT, id));
+            } else {
+              dmCaseMap.put(key, dmCaseElm);
+            }
+
+          }
+        }
+      }
+
+      // 4. Checking Missing ValueSet
+      HashMap<String, Element> valueSetMap = new HashMap<String, Element>();
+      NodeList valueSetDefinitions = valuesetsDoc.getElementsByTagName("ValueSetDefinition");
+      for (int i = 0; i < valueSetDefinitions.getLength(); i++) {
+        Element v = (Element) valueSetDefinitions.item(i);
+        valueSetMap.put(v.getAttribute("BindingIdentifier"), v);
+      }
+
+      for (String id : segmentMap.keySet()) {
+        Element segElm = segmentMap.get(id);
+        NodeList fields = segElm.getElementsByTagName("Field");
+
+        for (int i = 0; i < fields.getLength(); i++) {
+          Element feildElm = (Element) fields.item(i);
+          String bindingId = feildElm.getAttribute("Binding");
+          if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+            report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+                "ValueSet " + bindingId + " is missing for Segment " + id + "." + (i + 1),
+                DocumentTarget.VALUESET, bindingId));
+          }
+        }
+      }
+
+      for (String id : datatypeMap.keySet()) {
+        Element dtElm = datatypeMap.get(id);
+        NodeList components = dtElm.getElementsByTagName("Component");
+
+        for (int i = 0; i < components.getLength(); i++) {
+          Element componentElm = (Element) components.item(i);
+          String bindingId = componentElm.getAttribute("Binding");
+          if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+            report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+                "ValueSet " + bindingId + " is missing for Datatype " + id + "." + (i + 1),
+                DocumentTarget.VALUESET, bindingId));
+          }
+        }
+      }
+
+      NodeList valueSetAssertions = constrintsDoc.getElementsByTagName("ValueSet");
+      for (int i = 0; i < valueSetAssertions.getLength(); i++) {
+        Element valueSetAssertionElm = (Element) valueSetAssertions.item(i);
+        String bindingId = valueSetAssertionElm.getAttribute("ValueSetID");
+        if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+          report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+              "ValueSet " + bindingId + " is missing for Constraints.", DocumentTarget.VALUESET,
+              bindingId));
+        }
+      }
+
+    } catch (SAXException e) {
+      report
+          .addProfileError(new CustomProfileError(ErrorType.Unknown, e.getMessage(), null, null));;
+    } catch (ParserConfigurationException e) {
+      report
+          .addProfileError(new CustomProfileError(ErrorType.Unknown, e.getMessage(), null, null));;
+    } catch (IOException e) {
+      report
+          .addProfileError(new CustomProfileError(ErrorType.Unknown, e.getMessage(), null, null));;
+    }
 
 
-    // 2. Pasing
+    // 5. Pasing by core
 
-    /*
-    if(profileXSDVerificationResult.isSuccess()){
+    if (report.isSuccess()) {
       InputStream profileXMLIO = IOUtils.toInputStream(profileXMLStr, StandardCharsets.UTF_8);
       try {
         XMLDeserializer.deserialize(profileXMLIO).get();
-        ConstraintsParserImpl constraintsParser = new ConstraintsParserImpl();
-        
-        Constraints conformanceStatements = constraintsParser.confStatements(c1Xml);
-        Constraints predicates = constraintsParser.predicates(c1Xml);
-        
-        
       } catch (NoSuchElementException nsee) {
-        System.out.println(nsee);
+        report.addProfileError(new CustomProfileError(ErrorType.CoreParsingError, nsee.getMessage(), null, null));;
+
       } catch (Exception e) {
-        System.out.println(e);
-      }      
+        report.addProfileError(new CustomProfileError(ErrorType.Unknown, e.getMessage(), null, null));;
+      }
     }
-*/
 
 
+    return report;
   }
 
-  public void validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO,
-      InputStream valuesetXMLIO) throws IOException {
+  public ProfileValidationReport validationXMLs(InputStream profileXMLIO,
+      InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException {
     String profileXMLStr = IOUtils.toString(profileXMLIO, StandardCharsets.UTF_8);
     String constraintXMLStr = IOUtils.toString(constraintXMLIO, StandardCharsets.UTF_8);
     String valuesetXMLStr = IOUtils.toString(valuesetXMLIO, StandardCharsets.UTF_8);
 
-    this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr);
+    return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr);
   }
 
 
