@@ -34,9 +34,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import gov.nist.hit.hl7.profile.validation.domain.CustomProfileError;
-import gov.nist.hit.hl7.profile.validation.domain.DocumentTarget;
-import gov.nist.hit.hl7.profile.validation.domain.ErrorType;
 import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport;
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.DocumentTarget;
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.ErrorType;
 import gov.nist.hit.hl7.profile.validation.domain.XSDVerificationResult;
 import gov.nist.hit.hl7.profile.validation.service.ValidationService;
 import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
@@ -255,6 +255,14 @@ public class ValidationServiceImpl implements ValidationService {
     } catch (Exception e) {
       return new XSDVerificationResult(false, e);
     }
+  }
+
+  public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
+    return validationXMLs(profileXMLStr, constraintXMLStr,valuesetXMLStr).generateHTML();
+  }
+
+  public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException {
+    return validationXMLs(profileXMLIO, constraintXMLIO, valuesetXMLIO).generateHTML();
   }
 
 }

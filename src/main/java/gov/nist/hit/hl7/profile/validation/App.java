@@ -18,6 +18,6 @@ public class App {
     InputStream cio = ClassLoader.class.getResourceAsStream("/xmls/Constraints.xml");
     InputStream vio = ClassLoader.class.getResourceAsStream("/xmls/ValueSets.xml");
     
-    System.out.println(service.validationXMLs(pio, cio, vio));
+    System.out.println(service.validationXMLs(pio, cio, vio).generateHTML());
   }
 }

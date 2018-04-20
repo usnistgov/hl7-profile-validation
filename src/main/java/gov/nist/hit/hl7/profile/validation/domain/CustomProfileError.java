@@ -11,6 +11,9 @@
  */
 package gov.nist.hit.hl7.profile.validation.domain;
 
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.DocumentTarget;
+import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.ErrorType;
+
 /**
  * @author jungyubw
  *

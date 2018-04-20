@@ -25,7 +25,10 @@ public interface ValidationService {
 
   public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr);
   
-  
   public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException;
+  
+  public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr);
+  
+  public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException;
 
 }
