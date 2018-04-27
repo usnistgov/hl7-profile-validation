@@ -128,7 +128,7 @@ public class ValidationServiceImpl implements ValidationService {
       }
 
       // 3. Checking Dynamic Mapping
-      HashMap<String, Element> dmCaseMap = new HashMap<String, Element>();
+      HashMap<String[], Element> dmCaseMap = new HashMap<String[], Element>();
       for (String id : segmentMap.keySet()) {
         Element segElm = segmentMap.get(id);
         NodeList dmCases = segElm.getElementsByTagName("Case");
@@ -136,7 +136,7 @@ public class ValidationServiceImpl implements ValidationService {
         if (dmCases.getLength() > 0) {
           for (int i = 0; i < dmCases.getLength(); i++) {
             Element dmCaseElm = (Element) dmCases.item(i);
-            String key = dmCaseElm.getAttribute("Value");
+            String[] key = new String[] {dmCaseElm.getAttribute("Value"), dmCaseElm.getAttribute("SecondValue")};
             if (dmCaseMap.containsKey(key)) {
               report.addProfileError(new CustomProfileError(ErrorType.DuplicatedDynamicMapping,
                   "Segment " + id + " has duplicated Dynamic mapping definition for " + key + ".",

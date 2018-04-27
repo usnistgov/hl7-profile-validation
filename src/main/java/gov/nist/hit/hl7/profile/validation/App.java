@@ -14,9 +14,9 @@ public class App {
   public static void main(String[] args) throws IOException {
     ValidationService service = new ValidationServiceImpl();
     
-    InputStream pio = ClassLoader.class.getResourceAsStream("/xmls/Profile.xml");
-    InputStream cio = ClassLoader.class.getResourceAsStream("/xmls/Constraints.xml");
-    InputStream vio = ClassLoader.class.getResourceAsStream("/xmls/ValueSets.xml");
+    InputStream pio = ClassLoader.class.getResourceAsStream("/xmls/vital/Profile.xml");
+    InputStream cio = ClassLoader.class.getResourceAsStream("/xmls/vital/Constraints.xml");
+    InputStream vio = ClassLoader.class.getResourceAsStream("/xmls/vital/ValueSets.xml");
     
     System.out.println(service.validationXMLs(pio, cio, vio).generateHTML());
   }
