@@ -139,7 +139,7 @@
             <Field Name="Date/Time Of Birth" Usage="O" Datatype="TS_2-4" MinLength="0"
                 MaxLength="26" ConfLength="NA" Min="0" Max="1" ItemNo="00110"/>
             <Field Name="Administrative Sex" Usage="O" Datatype="IS_ForDM8663_2-4" MinLength="0"
-                MaxLength="1" ConfLength="NA" Binding="0001_2-4" BindingStrength="R" Min="0" Max="1"
+                MaxLength="1" ConfLength="NA" Binding="0001_2-4:NOTABLE" BindingStrength="R" Min="0" Max="1"
                 ItemNo="00111"/>
             <Field Name="Patient Alias" Usage="O" Datatype="XPN_2-4" MinLength="0" MaxLength="250"
                 ConfLength="NA" Min="0" Max="*" ItemNo="00112"/>
@@ -1478,7 +1478,7 @@
         <Segment ID="IN1_2-4" Name="IN1" Label="IN1" Description="Insurance">
             <Field Name="Set ID - IN1" Usage="R" Datatype="SI_2-4" MinLength="0" MaxLength="4"
                 ConfLength="NA" Min="1" Max="1" ItemNo="00426"/>
-            <Field Name="Insurance Plan ID" Usage="R" Datatype="CE_0072_2-4" MinLength="0"
+            <Field Name="Insurance Plan ID" Usage="R" Datatype="CE_AA" MinLength="0"
                 MaxLength="250" ConfLength="NA" Min="1" Max="1" ItemNo="00368"/>
             <Field Name="Insurance Company ID" Usage="R" Datatype="CX_2-4" MinLength="0"
                 MaxLength="250" ConfLength="NA" Min="1" Max="*" ItemNo="00428"/>
@@ -1635,7 +1635,7 @@
                 MaxLength="12" ConfLength="NA" Min="0" Max="1" ItemNo="00366"/>
             <Field Name="Department Code" Usage="O" Datatype="CE_0049_2-4" MinLength="0"
                 MaxLength="250" ConfLength="NA" Min="0" Max="1" ItemNo="00367"/>
-            <Field Name="Insurance Plan ID" Usage="O" Datatype="CE_0072_2-4" MinLength="0"
+            <Field Name="Insurance Plan ID" Usage="O" Datatype="CE_AA" MinLength="0"
                 MaxLength="250" ConfLength="NA" Min="0" Max="1" ItemNo="00368"/>
             <Field Name="Insurance Amount" Usage="O" Datatype="CP_2-4" MinLength="0" MaxLength="12"
                 ConfLength="NA" Min="0" Max="1" ItemNo="00369"/>
@@ -2036,7 +2036,7 @@
             <Component Name="date/time" Usage="O" Datatype="TS_2-4" MinLength="0" MaxLength="NA"
                 ConfLength="NA"/>
         </Datatype>
-        <Datatype ID="CE_0072_2-4" Name="CE_0072" Label="CE_0072" Description="No Description">
+        <Datatype ID="CE_AA" Name="CE_0072" Label="CE_0072" Description="No Description">
             <Component Name="identifier (ST)" Usage="C" Datatype="ST_ForDM1003_2-4" MinLength="0"
                 MaxLength="NA" ConfLength="NA"/>
             <Component Name="text" Usage="C" Datatype="ST_ForDM1003_2-4" MinLength="0"

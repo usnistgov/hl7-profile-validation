@@ -163,11 +163,15 @@ public class ValidationServiceImpl implements ValidationService {
 
         for (int i = 0; i < fields.getLength(); i++) {
           Element feildElm = (Element) fields.item(i);
-          String bindingId = feildElm.getAttribute("Binding");
-          if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
-            report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
-                "ValueSet " + bindingId + " is missing for Segment " + id + "." + (i + 1),
-                DocumentTarget.VALUESET, bindingId));
+          String bindingIds = feildElm.getAttribute("Binding");
+          if (bindingIds != null && !bindingIds.equals("")) {
+            for(String bindingId:bindingIds.split("\\:")) {
+              if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+                report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+                    "ValueSet " + bindingId + " is missing for Segment " + id + "." + (i + 1),
+                    DocumentTarget.VALUESET, bindingId));
+              }    
+            }  
           }
         }
       }
@@ -178,11 +182,15 @@ public class ValidationServiceImpl implements ValidationService {
 
         for (int i = 0; i < components.getLength(); i++) {
           Element componentElm = (Element) components.item(i);
-          String bindingId = componentElm.getAttribute("Binding");
-          if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
-            report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
-                "ValueSet " + bindingId + " is missing for Datatype " + id + "." + (i + 1),
-                DocumentTarget.VALUESET, bindingId));
+          String bindingIds = componentElm.getAttribute("Binding");
+          if (bindingIds != null && !bindingIds.equals("")) {
+            for(String bindingId:bindingIds.split("\\:")) {
+              if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+                report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+                    "ValueSet " + bindingId + " is missing for Datatype " + id + "." + (i + 1),
+                    DocumentTarget.VALUESET, bindingId));
+              }    
+            }
           }
         }
       }
