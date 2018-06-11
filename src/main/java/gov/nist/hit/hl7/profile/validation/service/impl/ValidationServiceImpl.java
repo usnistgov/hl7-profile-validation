@@ -119,8 +119,8 @@ public class ValidationServiceImpl implements ValidationService {
 
             if (subComponentDTElm.getElementsByTagName("Component").getLength() > 0) {
               report.addProfileError(new CustomProfileError(
-                  ErrorType.FiveLevelComponent, id + "." + (i + 1) + "." + (j + 1) + " Datatype is "
-                      + subComnponentDTId + ", but it is not primitive.",
+                  ErrorType.FiveLevelComponent, dtElm.getAttribute("Label") + "." + (i + 1) + "." + (j + 1) + " Datatype is "
+                      + subComponentDTElm.getAttribute("Label") + ", but it is not primitive.",
                   DocumentTarget.DATATYPE, subComnponentDTId));
             }
           }
@@ -139,7 +139,7 @@ public class ValidationServiceImpl implements ValidationService {
             String[] key = new String[] {dmCaseElm.getAttribute("Value"), dmCaseElm.getAttribute("SecondValue")};
             if (dmCaseMap.containsKey(key)) {
               report.addProfileError(new CustomProfileError(ErrorType.DuplicatedDynamicMapping,
-                  "Segment " + id + " has duplicated Dynamic mapping definition for " + key + ".",
+                  "Segment " + segElm.getAttribute("Label") + " has duplicated Dynamic mapping definition for " + key + ".",
                   DocumentTarget.SEGMENT, id));
             } else {
               dmCaseMap.put(key, dmCaseElm);
@@ -168,7 +168,7 @@ public class ValidationServiceImpl implements ValidationService {
             for(String bindingId:bindingIds.split("\\:")) {
               if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
                 report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
-                    "ValueSet " + bindingId + " is missing for Segment " + id + "." + (i + 1),
+                    "ValueSet " + bindingId + " is missing for Segment " + segElm.getAttribute("Label") + "." + (i + 1),
                     DocumentTarget.VALUESET, bindingId));
               }    
             }  
@@ -187,7 +187,7 @@ public class ValidationServiceImpl implements ValidationService {
             for(String bindingId:bindingIds.split("\\:")) {
               if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
                 report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
-                    "ValueSet " + bindingId + " is missing for Datatype " + id + "." + (i + 1),
+                    "ValueSet " + bindingId + " is missing for Datatype " + dtElm.getAttribute("Label") + "." + (i + 1),
                     DocumentTarget.VALUESET, bindingId));
               }    
             }
