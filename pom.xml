@@ -55,4 +55,10 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
+	<scm>
+		<connection>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</connection>
+		<url>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</url>
+		<developerConnection>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</developerConnection>
+  </scm>
 </project>
