@@ -40,7 +40,9 @@ import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.ErrorT
 import gov.nist.hit.hl7.profile.validation.domain.XSDVerificationResult;
 import gov.nist.hit.hl7.profile.validation.service.ValidationService;
 import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
+import hl7.v2.profile.Profile;
 import hl7.v2.profile.XMLDeserializer;
+import scala.util.Try;
 
 /**
  * @author jungyubw
@@ -224,6 +226,8 @@ public class ValidationServiceImpl implements ValidationService {
       InputStream profileXMLIO = IOUtils.toInputStream(profileXMLStr, StandardCharsets.UTF_8);
       try {
         XMLDeserializer.deserialize(profileXMLIO).get();
+      } catch (java.lang.Error error) {
+    	  report.addProfileError(new CustomProfileError(ErrorType.CoreParsingError, error.getMessage(), null, null));;
       } catch (NoSuchElementException nsee) {
         report.addProfileError(new CustomProfileError(ErrorType.CoreParsingError, nsee.getMessage(), null, null));;
 
