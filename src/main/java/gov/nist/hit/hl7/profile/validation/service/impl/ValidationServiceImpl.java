@@ -226,7 +226,7 @@ public class ValidationServiceImpl implements ValidationService {
       InputStream profileXMLIO = IOUtils.toInputStream(profileXMLStr, StandardCharsets.UTF_8);
       try {
         XMLDeserializer.deserialize(profileXMLIO).get();
-      } catch (java.lang.Error error) {
+      } catch (Error error) {
     	  report.addProfileError(new CustomProfileError(ErrorType.CoreParsingError, error.getMessage(), null, null));;
       } catch (NoSuchElementException nsee) {
         report.addProfileError(new CustomProfileError(ErrorType.CoreParsingError, nsee.getMessage(), null, null));;
