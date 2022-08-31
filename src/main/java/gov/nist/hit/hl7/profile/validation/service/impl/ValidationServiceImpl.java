@@ -14,7 +14,6 @@ package gov.nist.hit.hl7.profile.validation.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -40,9 +39,7 @@ import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.ErrorT
 import gov.nist.hit.hl7.profile.validation.domain.XSDVerificationResult;
 import gov.nist.hit.hl7.profile.validation.service.ValidationService;
 import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
-import hl7.v2.profile.Profile;
 import hl7.v2.profile.XMLDeserializer;
-import scala.util.Try;
 
 /**
  * @author jungyubw
@@ -50,10 +47,6 @@ import scala.util.Try;
  */
 
 public class ValidationServiceImpl implements ValidationService {
-	private static String profileXSDurl = "https://raw.githubusercontent.com/Jungyubw/NIST_healthcare_hl7_v2_profile_schema/master/Schema/NIST%20Validation%20Schema/Profile.xsd";
-	private static String valueSetXSDurl = "https://raw.githubusercontent.com/Jungyubw/NIST_healthcare_hl7_v2_profile_schema/master/Schema/NIST%20Validation%20Schema/ValueSets.xsd";
-	private static String constraintXSDurl = "https://raw.githubusercontent.com/Jungyubw/NIST_healthcare_hl7_v2_profile_schema/master/Schema/NIST%20Validation%20Schema/ConformanceContext.xsd";
-
 	private static String localProfilePath = "/schema/Profile.xsd";
 	private static String localValueSetPath = "/schema/ValueSets.xsd";
 	private static String localConstraintPath = "/schema/ConformanceContext.xsd";
@@ -257,24 +250,6 @@ public class ValidationServiceImpl implements ValidationService {
 		String valuesetXMLStr = IOUtils.toString(valuesetXMLIO, StandardCharsets.UTF_8);
 
 		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr);
-	}
-
-	private XSDVerificationResult verifyXMLByXSD(String xsdURL, String xml) {
-		try {
-			URL schemaFile = new URL(xsdURL);
-			Source xmlFile = new StreamSource(new StringReader(xml));
-			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(schemaFile);
-			Validator validator = schema.newValidator();
-			validator.validate(xmlFile);
-			return new XSDVerificationResult(true, null);
-		} catch (SAXException e) {
-			return new XSDVerificationResult(false, e);
-		} catch (IOException e) {
-			return new XSDVerificationResult(false, e);
-		} catch (Exception e) {
-			return new XSDVerificationResult(false, e);
-		}
 	}
 
 	private XSDVerificationResult verifyXMLByLocalXSD(String xsdLocalPath, String xml) {
