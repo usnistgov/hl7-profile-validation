@@ -256,7 +256,7 @@ public class ValidationServiceImpl implements ValidationService {
 		try {
 			Source xmlFile = new StreamSource(new StringReader(xml));
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(ClassLoader.class.getResource(xsdLocalPath));
+			Schema schema = schemaFactory.newSchema(this.getClass().getResource(xsdLocalPath));
 			Validator validator = schema.newValidator();
 			validator.validate(xmlFile);
 			return new XSDVerificationResult(true, null);
