@@ -50,26 +50,24 @@ public class ValidationServiceImpl implements ValidationService {
 	private static String localProfilePath = "/schema/Profile.xsd";
 	private static String localValueSetPath = "/schema/ValueSets.xsd";
 	private static String localConstraintPath = "/schema/ConformanceContext.xsd";
+	private static String localCoConstraintPath = "/schema/CoConstraintContext.xsd";
+	private static String localBindingPath = "/schema/ValueSetBindings.xsd";
+	private static String localSlicingPath = "/schema/ProfileSlicing.xsd";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * gov.nist.hit.hl7.profile.validation.service.ValidationService#validationXMLs(
-	 * java.lang.String, java.lang.String, java.lang.String)
-	 */
-	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr,
-			String valuesetXMLStr) {
+	@Override
+	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr,
+			String coconstraintXML, String pofileSlicingXML, String bindingXML) {
 		ProfileValidationReport report = new ProfileValidationReport();
 		// 1. XML Validation by XSD
-//		report.setProfileXSDValidationResult(this.verifyXMLByXSD(profileXSDurl, profileXMLStr));
-//		report.setValueSetXSDValidationResult(this.verifyXMLByXSD(valueSetXSDurl, valuesetXMLStr));
-//		report.setConstraintsXSDValidationResult(this.verifyXMLByXSD(constraintXSDurl, constraintXMLStr));
 
 		report.setProfileXSDValidationResult(this.verifyXMLByLocalXSD(localProfilePath, profileXMLStr));
 		report.setValueSetXSDValidationResult(this.verifyXMLByLocalXSD(localValueSetPath, valuesetXMLStr));
 		report.setConstraintsXSDValidationResult(this.verifyXMLByLocalXSD(localConstraintPath, constraintXMLStr));
-
+		
+		if(coconstraintXML != null) report.setCoconstraintsXSDValidationResult(this.verifyXMLByLocalXSD(localCoConstraintPath, coconstraintXML));
+		if(pofileSlicingXML != null) report.setSlicingXSDValidationResult(this.verifyXMLByLocalXSD(localSlicingPath, pofileSlicingXML));
+		if(bindingXML != null) report.setBindingXSDValidationResult(this.verifyXMLByLocalXSD(localBindingPath, bindingXML));
+		
 		try {
 			Document profileDoc = XMLManager.stringToDom(profileXMLStr);
 			Document constrintsDoc = XMLManager.stringToDom(constraintXMLStr);
@@ -242,16 +240,68 @@ public class ValidationServiceImpl implements ValidationService {
 
 		return report;
 	}
-
+	
+	@Override
+	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
+		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr, null, null, null);
+	}
+	
+	@Override
 	public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO,
-			InputStream valuesetXMLIO) throws IOException {
+			InputStream valuesetXMLIO, InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO,
+			InputStream bindingXMLIO) throws IOException {
 		String profileXMLStr = IOUtils.toString(profileXMLIO, StandardCharsets.UTF_8);
 		String constraintXMLStr = IOUtils.toString(constraintXMLIO, StandardCharsets.UTF_8);
 		String valuesetXMLStr = IOUtils.toString(valuesetXMLIO, StandardCharsets.UTF_8);
+		
+		String coconstraintXMLStr = null;
+		if(coconstraintXMLIO != null) coconstraintXMLStr = IOUtils.toString(coconstraintXMLIO, StandardCharsets.UTF_8);
+		
+		String pofileSlicingXMLStr = null;
+		if(pofileSlicingXMLIO != null) pofileSlicingXMLStr = IOUtils.toString(pofileSlicingXMLIO, StandardCharsets.UTF_8);
 
-		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr);
+		String bindingXMLStr = null;
+		if(bindingXMLIO != null) bindingXMLStr = IOUtils.toString(bindingXMLIO, StandardCharsets.UTF_8);
+
+		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr, coconstraintXMLStr, pofileSlicingXMLStr, bindingXMLStr);
+	}
+	
+	@Override
+	public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO,
+			InputStream valuesetXMLIO) throws IOException {
+		return this.validationXMLs(profileXMLIO, constraintXMLIO, valuesetXMLIO, null, null, null);
+	}
+	
+
+	@Override
+	public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr,
+			String coconstraintXML, String pofileSlicingXML, String bindingXML) {
+		return validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr, coconstraintXML, pofileSlicingXML, bindingXML).generateHTML();
+	}
+	
+	@Override
+	public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
+		return this.validationXMLsHTML(profileXMLStr, constraintXMLStr, valuesetXMLStr, null, null, null);
+	}
+	
+	@Override
+	public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO,
+			InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO, InputStream bindingXMLIO)
+			throws IOException {
+		return validationXMLs(profileXMLIO, constraintXMLIO, valuesetXMLIO, coconstraintXMLIO, pofileSlicingXMLIO, bindingXMLIO).generateHTML();
 	}
 
+	
+
+
+
+	@Override
+	public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO)
+			throws IOException {
+		return this.validationXMLsHTML(profileXMLIO, constraintXMLIO, valuesetXMLIO, null, null, null);
+	}
+
+	
 	private XSDVerificationResult verifyXMLByLocalXSD(String xsdLocalPath, String xml) {
 		try {
 			Source xmlFile = new StreamSource(new StringReader(xml));
@@ -268,14 +318,4 @@ public class ValidationServiceImpl implements ValidationService {
 			return new XSDVerificationResult(false, e);
 		}
 	}
-
-	public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
-		return validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr).generateHTML();
-	}
-
-	public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO)
-			throws IOException {
-		return validationXMLs(profileXMLIO, constraintXMLIO, valuesetXMLIO).generateHTML();
-	}
-
 }
