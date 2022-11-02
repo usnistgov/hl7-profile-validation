@@ -30,5 +30,13 @@ public interface ValidationService {
   public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr);
   
   public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO) throws IOException;
+  
+  public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr, String coconstraintXML, String pofileSlicingXML, String bindingXML);
+  
+  public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO, InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO, InputStream bindingXMLIO) throws IOException;
+  
+  public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr, String coconstraintXML, String pofileSlicingXML, String bindingXML);
+  
+  public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO, InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO, InputStream bindingXMLIO) throws IOException;
 
 }
