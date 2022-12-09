@@ -167,61 +167,65 @@ public class ProfileValidationReport {
 
 			reportHTML = reportHTML.replace("$ValueSets-Result$", valueSetsResult);
 		}
+		if(this.getCoconstraintsXSDValidationResult() != null) {
+			if (this.getCoconstraintsXSDValidationResult().isSuccess()) {
+				String coConstraintsResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" valign=\"top\">CoConstraints XSD Validation</td>"
+						+ "<td class=\"row2\">Valid CoConstraints XML</td>" + "</tr>" + "</table>" + "</div>";
 
-		if (this.getCoconstraintsXSDValidationResult() != null
-				&& this.getCoconstraintsXSDValidationResult().isSuccess()) {
-			String coConstraintsResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" valign=\"top\">CoConstraints XSD Validation</td>"
-					+ "<td class=\"row2\">Valid CoConstraints XML</td>" + "</tr>" + "</table>" + "</div>";
+				reportHTML = reportHTML.replace("$CoConstraints-Result$", coConstraintsResult);
+			} else {
+				String coConstraintsResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">CoConstraints XSD Validation</td>"
+						+ "<td class=\"row2\">Invalid CoConstraints XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
+						+ this.getCoconstraintsXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
+						+ "</div>";
 
-			reportHTML = reportHTML.replace("$CoConstraints-Result$", coConstraintsResult);
-		} else {
-			String coConstraintsResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">CoConstraints XSD Validation</td>"
-					+ "<td class=\"row2\">Invalid CoConstraints XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
-					+ this.getCoconstraintsXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
-					+ "</div>";
-
-			reportHTML = reportHTML.replace("$CoConstraints-Result$", coConstraintsResult);
+				reportHTML = reportHTML.replace("$CoConstraints-Result$", coConstraintsResult);
+			}
 		}
-
-		if (this.getSlicingXSDValidationResult() != null && this.getSlicingXSDValidationResult().isSuccess()) {
-			String slicingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" valign=\"top\">Slicing XSD Validation</td>"
-					+ "<td class=\"row2\">Valid Slicing XML</td>" + "</tr>" + "</table>" + "</div>";
-
-			reportHTML = reportHTML.replace("$Slicings-Result$", slicingResult);
-		} else {
-			String slicingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">Slicing XSD Validation</td>"
-					+ "<td class=\"row2\">Invalid Slicing XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
-					+ this.getSlicingXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
-					+ "</div>";
-
-			reportHTML = reportHTML.replace("$Slicings-Result$", slicingResult);
+		
+		if (this.getSlicingXSDValidationResult() != null) {
+			if (this.getSlicingXSDValidationResult().isSuccess()) {
+				String slicingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" valign=\"top\">Slicing XSD Validation</td>"
+						+ "<td class=\"row2\">Valid Slicing XML</td>" + "</tr>" + "</table>" + "</div>";
+	
+				reportHTML = reportHTML.replace("$Slicings-Result$", slicingResult);
+			} else {
+				String slicingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">Slicing XSD Validation</td>"
+						+ "<td class=\"row2\">Invalid Slicing XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
+						+ this.getSlicingXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
+						+ "</div>";
+	
+				reportHTML = reportHTML.replace("$Slicings-Result$", slicingResult);
+			}
 		}
+		if (this.getBindingXSDValidationResult() != null) {
+			if (this.getBindingXSDValidationResult().isSuccess()) {
+				String bindingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" valign=\"top\">ValusetBinding XSD Validation</td>"
+						+ "<td class=\"row2\">Valid ValusetBinding XML</td>" + "</tr>" + "</table>" + "</div>";
 
-		if (this.getBindingXSDValidationResult() != null && this.getBindingXSDValidationResult().isSuccess()) {
-			String bindingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" valign=\"top\">ValusetBinding XSD Validation</td>"
-					+ "<td class=\"row2\">Valid ValusetBinding XML</td>" + "</tr>" + "</table>" + "</div>";
+				reportHTML = reportHTML.replace("$Bindings-Result$", bindingResult);
+			} else {
+				String bindingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
+						+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
+						+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">ValusetBinding XSD Validation</td>"
+						+ "<td class=\"row2\">Invalid ValusetBinding XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
+						+ this.getBindingXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
+						+ "</div>";
 
-			reportHTML = reportHTML.replace("$Bindings-Result$", bindingResult);
-		} else {
-			String bindingResult = "<div id=\"mvrTestingToolBox\" style=\"display:block;\">" + "<br/>"
-					+ "<table width=\"100%\" cellpadding=\"2\" cellspacing=\"1\" border=\"0\" class=\"forumline\">"
-					+ "<tr>" + "<td class=\"row1\" rowspan=\"2\" valign=\"top\">ValusetBinding XSD Validation</td>"
-					+ "<td class=\"row2\">Invalid ValusetBinding XML</td>" + "</tr>" + "<tr>" + "<td class=\"row3\">"
-					+ this.getBindingXSDValidationResult().getE().getMessage() + "</td>" + "</tr>" + "</table>"
-					+ "</div>";
-
-			reportHTML = reportHTML.replace("$Bindings-Result$", bindingResult);
+				reportHTML = reportHTML.replace("$Bindings-Result$", bindingResult);
+			}
 		}
+		
 
 		if (this.getProfileErrors() == null || this.getProfileErrors().size() == 0) {
 			reportHTML = reportHTML.replace("$Custom-Result$", "");
