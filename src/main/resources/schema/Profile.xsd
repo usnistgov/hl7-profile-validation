@@ -169,6 +169,7 @@
 			<xs:enumeration value="B"/>
 			<xs:enumeration value="W"/>
 			<xs:enumeration value="CE"/>
+			<xs:enumeration value="IX"/>
 		</xs:restriction>
 	</xs:simpleType>
 

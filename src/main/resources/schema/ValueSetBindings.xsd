@@ -101,7 +101,7 @@
 		<xs:sequence>
 			<xs:element ref="BindingLocations"/>
 		</xs:sequence>
-		<xs:attribute name="Target" use="required"/>
+		<xs:attribute name="Target" type="PathType" use="required"/>
 		<xs:attribute name="Code" use="required"/>
 		<xs:attribute name="CodeSystem" use="required"/>
 	</xs:complexType>
@@ -111,8 +111,7 @@
 			<xs:element ref="BindingLocations"/>
 			<xs:element ref="Bindings"/>
 		</xs:sequence>
-<!--		<xs:attribute name="ID" use="required"/>-->
-		<xs:attribute name="Target" use="required"/>
+		<xs:attribute name="Target" type="PathType" use="required"/>
 		<xs:attribute name="BindingStrength" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -128,14 +127,14 @@
 			<xs:choice>
 				<xs:element name="SimpleBindingLocation" minOccurs="1" maxOccurs="unbounded">
 					<xs:complexType>
-						<xs:attribute name="CodeLocation" use="required"/>
+						<xs:attribute name="CodeLocation" type="PathType" use="required"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="ComplexBindingLocation" minOccurs="1" maxOccurs="unbounded">
 					<xs:complexType>
-						<xs:attribute name="CodeLocation" use="required"/>
-						<xs:attribute name="CodeSystemLocation" use="required"/>
-						<xs:attribute name="CodeSystemOIDLocation"/>
+						<xs:attribute name="CodeLocation" type="PathType" use="required"/>
+						<xs:attribute name="CodeSystemLocation" type="PathType" use="required"/>
+						<xs:attribute name="CodeSystemOIDLocation" type="PathType"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:choice>
