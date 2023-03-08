@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.hl7</groupId>
 	<artifactId>xml-verification</artifactId>
-	<version>1.6.0-LEGACY</version>
+	<version>1.6.1-LEGACY-SNAPSHOT</version>
 	<name>xml-verification</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -114,6 +114,6 @@
 		<connection>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</connection>
 		<url>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</url>
 		<developerConnection>scm:git:https://github.com/usnistgov/hl7-profile-validation.git</developerConnection>
-    <tag>xml-verification-1.6.0-LEGACY</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
