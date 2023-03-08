@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.hl7</groupId>
 	<artifactId>xml-verification</artifactId>
-	<version>1.6.1-LEGACY-SNAPSHOT</version>
+	<version>1.6.0-LEGACY-SNAPSHOT</version>
 	<name>xml-verification</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -102,12 +102,12 @@
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
-			<url>https://hit-dev.nist.gov:9001/repository/releases</url>
+			<url>https://hit-nexus.nist.gov/repository/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
 			<name>Internal Snapshots</name>
-			<url>https://hit-dev.nist.gov:9001/repository/snapshots</url>
+			<url>https://hit-nexus.nist.gov/repository/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<scm>
