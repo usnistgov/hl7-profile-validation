@@ -41,34 +41,36 @@ import gov.nist.hit.hl7.profile.validation.service.ValidationService;
 import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
 import hl7.v2.profile.XMLDeserializer;
 
+import gov.nist.hit.hl7.v2.schemas.utils.HL7v2Schema;
+
 /**
  * @author jungyubw
  *
  */
 
 public class ValidationServiceImpl implements ValidationService {
-	private static String localProfilePath = "/schema/Profile.xsd";
-	private static String localValueSetPath = "/schema/ValueSets.xsd";
-	private static String localConstraintPath = "/schema/ConformanceContext.xsd";
-	private static String localCoConstraintPath = "/schema/CoConstraintContext.xsd";
-	private static String localBindingPath = "/schema/ValueSetBindings.xsd";
-	private static String localSlicingPath = "/schema/ProfileSlicing.xsd";
+//	private static String localProfilePath = "/schema/Profile.xsd";
+//	private static String localValueSetPath = "/schema/ValueSets.xsd";
+//	private static String localConstraintPath = "/schema/ConformanceContext.xsd";
+//	private static String localCoConstraintPath = "/schema/CoConstraintContext.xsd";
+//	private static String localBindingPath = "/schema/ValueSetBindings.xsd";
+//	private static String localSlicingPath = "/schema/ProfileSlicing.xsd";
 
 	@Override
 	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr,
 			String coconstraintXML, String pofileSlicingXML, String bindingXML) {
 		ProfileValidationReport report = new ProfileValidationReport();
 		// 1. XML Validation by XSD
-
-		report.setProfileXSDValidationResult(this.verifyXMLByLocalXSD(localProfilePath, profileXMLStr));
-		report.setValueSetXSDValidationResult(this.verifyXMLByLocalXSD(localValueSetPath, valuesetXMLStr));
-		report.setConstraintsXSDValidationResult(this.verifyXMLByLocalXSD(localConstraintPath, constraintXMLStr));
-		
-		if(coconstraintXML != null) report.setCoconstraintsXSDValidationResult(this.verifyXMLByLocalXSD(localCoConstraintPath, coconstraintXML));
-		if(pofileSlicingXML != null) report.setSlicingXSDValidationResult(this.verifyXMLByLocalXSD(localSlicingPath, pofileSlicingXML));
-		if(bindingXML != null) report.setBindingXSDValidationResult(this.verifyXMLByLocalXSD(localBindingPath, bindingXML));
-		
 		try {
+			report.setProfileXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getProfileSchema(), profileXMLStr));
+			report.setValueSetXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getValueSetLibrarySchema(), valuesetXMLStr));
+			report.setConstraintsXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getConformanceContextSchema(), constraintXMLStr));
+			
+			if(coconstraintXML != null) report.setCoconstraintsXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getCoConstraintsSchema(), coconstraintXML));
+			if(pofileSlicingXML != null) report.setSlicingXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getSlicingSchema(), pofileSlicingXML));
+			if(bindingXML != null) report.setBindingXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getValueSetBindingsSchema(), bindingXML));
+		
+		
 			Document profileDoc = XMLManager.stringToDom(profileXMLStr);
 			Document constrintsDoc = XMLManager.stringToDom(constraintXMLStr);
 			Document valuesetsDoc = XMLManager.stringToDom(valuesetXMLStr);
@@ -307,6 +309,21 @@ public class ValidationServiceImpl implements ValidationService {
 			Source xmlFile = new StreamSource(new StringReader(xml));
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(this.getClass().getResource(xsdLocalPath));
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+			return new XSDVerificationResult(true, null);
+		} catch (SAXException e) {
+			return new XSDVerificationResult(false, e);
+		} catch (IOException e) {
+			return new XSDVerificationResult(false, e);
+		} catch (Exception e) {
+			return new XSDVerificationResult(false, e);
+		}
+	}
+	
+	private XSDVerificationResult verifyXMLByLocalXSD(Schema schema, String xml) {
+		try {
+			Source xmlFile = new StreamSource(new StringReader(xml));			
 			Validator validator = schema.newValidator();
 			validator.validate(xmlFile);
 			return new XSDVerificationResult(true, null);
