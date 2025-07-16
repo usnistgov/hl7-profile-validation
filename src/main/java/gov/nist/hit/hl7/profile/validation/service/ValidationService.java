@@ -13,6 +13,7 @@ package gov.nist.hit.hl7.profile.validation.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport;
 
@@ -38,5 +39,8 @@ public interface ValidationService {
   public String validationXMLsHTML(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr, String coconstraintXML, String pofileSlicingXML, String bindingXML);
   
   public String validationXMLsHTML(InputStream profileXMLIO, InputStream constraintXMLIO, InputStream valuesetXMLIO, InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO, InputStream bindingXMLIO) throws IOException;
+
+  public ProfileValidationReport validationXMLs(String profileXML, List<String> constraintXMLList, String valuesetXML, String coconstraintXML, String pofileSlicingXML,
+		String bindingXML);
 
 }

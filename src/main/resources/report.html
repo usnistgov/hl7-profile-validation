@@ -53,7 +53,15 @@
 
 .profile-validation-report .maintitle {
     font-weight: bold;
-    font-size: 22px;
+    font-size: 18px;
+    font-family: Georgia, Verdana;
+    text-decoration: none;
+    line-height: 100%;
+    color: #000000;
+}
+
+.profile-validation-report .testname {
+    font-size: 18px;
     font-family: Georgia, Verdana;
     text-decoration: none;
     line-height: 100%;
@@ -68,13 +76,6 @@
     margin-bottom: 20px;
 }
 
-.profile-validation-report .cf-report-category {
-// margin-bottom:10px;
-}
-
-.profile-validation-report .cf-tbody {
-//  border: 1px white solid;
-}
 
 .profile-validation-report .alert-info-2 {
     background-color: #428bca;
@@ -144,9 +145,9 @@
 				class="forumline">
 				<tr>
 					<td>
-						<font class="maintitle">
-							Profile Verification Report
-						</font>
+						<span class="maintitle">Profile Verification Report:</span> <span class="testname">$TestName$</span>
+							
+						
 					</td>
 				</tr>
 			</table>
@@ -175,6 +176,8 @@
 		$Bindings-Result$
 		
 		$Custom-Result$
+		
+		$Generic-Result$
 		
 		</div>
 </body>

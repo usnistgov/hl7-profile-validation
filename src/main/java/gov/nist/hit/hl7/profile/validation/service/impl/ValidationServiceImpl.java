@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.xml.XMLConstants;
@@ -39,9 +41,8 @@ import gov.nist.hit.hl7.profile.validation.domain.ProfileValidationReport.ErrorT
 import gov.nist.hit.hl7.profile.validation.domain.XSDVerificationResult;
 import gov.nist.hit.hl7.profile.validation.service.ValidationService;
 import gov.nist.hit.hl7.profile.validation.service.util.XMLManager;
-import hl7.v2.profile.XMLDeserializer;
-
 import gov.nist.hit.hl7.v2.schemas.utils.HL7v2Schema;
+import hl7.v2.profile.XMLDeserializer;
 
 /**
  * @author jungyubw
@@ -49,31 +50,47 @@ import gov.nist.hit.hl7.v2.schemas.utils.HL7v2Schema;
  */
 
 public class ValidationServiceImpl implements ValidationService {
-//	private static String localProfilePath = "/schema/Profile.xsd";
-//	private static String localValueSetPath = "/schema/ValueSets.xsd";
-//	private static String localConstraintPath = "/schema/ConformanceContext.xsd";
-//	private static String localCoConstraintPath = "/schema/CoConstraintContext.xsd";
-//	private static String localBindingPath = "/schema/ValueSetBindings.xsd";
-//	private static String localSlicingPath = "/schema/ProfileSlicing.xsd";
 
+	
+	@Override
+	public ProfileValidationReport validationXMLs(String profileXML, List<String>constraintXMLList,
+			String valuesetXML, String coconstraintXML, String pofileSlicingXML,
+			String bindingXML) {				
+		return this.validate(profileXML, constraintXMLList, valuesetXML, coconstraintXML, pofileSlicingXML, bindingXML);
+	}
+	
 	@Override
 	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr,
 			String coconstraintXML, String pofileSlicingXML, String bindingXML) {
+		List<String> constraintList = new ArrayList<String>();
+		constraintList.add(constraintXMLStr);
+		return this.validate(profileXMLStr, constraintList, valuesetXMLStr, coconstraintXML, pofileSlicingXML, bindingXML);
+	}
+	
+	
+	private ProfileValidationReport validate(String profileXML, List<String>constraintXMLList,
+			String valuesetXML, String coconstraintXML, String pofileSlicingXML,
+			String bindingXML){
+				
 		ProfileValidationReport report = new ProfileValidationReport();
 		// 1. XML Validation by XSD
 		try {
-			report.setProfileXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getProfileSchema(), profileXMLStr));
-			report.setValueSetXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getValueSetLibrarySchema(), valuesetXMLStr));
-			report.setConstraintsXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getConformanceContextSchema(), constraintXMLStr));
-			
+			report.setProfileXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getProfileSchema(), profileXML));
+			report.setValueSetXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getValueSetLibrarySchema(), valuesetXML));
+			for(String c : constraintXMLList) {
+				report.setConstraintsXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getConformanceContextSchema(), c));
+			}
 			if(coconstraintXML != null) report.setCoconstraintsXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getCoConstraintsSchema(), coconstraintXML));
 			if(pofileSlicingXML != null) report.setSlicingXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getSlicingSchema(), pofileSlicingXML));
 			if(bindingXML != null) report.setBindingXSDValidationResult(this.verifyXMLByLocalXSD(HL7v2Schema.getValueSetBindingsSchema(), bindingXML));
 		
 		
-			Document profileDoc = XMLManager.stringToDom(profileXMLStr);
-			Document constrintsDoc = XMLManager.stringToDom(constraintXMLStr);
-			Document valuesetsDoc = XMLManager.stringToDom(valuesetXMLStr);
+			Document profileDoc = XMLManager.stringToDom(profileXML);
+			List<Document> constrintsDocList = new ArrayList<Document>();
+			for(String c : constraintXMLList) {
+				constrintsDocList.add(XMLManager.stringToDom(c));
+			}
+			Document valuesetsDoc = XMLManager.stringToDom(valuesetXML);
 
 			Element messagesElm = (Element) profileDoc.getElementsByTagName("Messages").item(0);
 			Element segmentsElm = (Element) profileDoc.getElementsByTagName("Segments").item(0);
@@ -197,16 +214,19 @@ public class ValidationServiceImpl implements ValidationService {
 				}
 			}
 
-			NodeList valueSetAssertions = constrintsDoc.getElementsByTagName("ValueSet");
-			for (int i = 0; i < valueSetAssertions.getLength(); i++) {
-				Element valueSetAssertionElm = (Element) valueSetAssertions.item(i);
-				String bindingId = valueSetAssertionElm.getAttribute("ValueSetID");
-				if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
-					report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
-							"ValueSet " + bindingId + " is missing for Constraints.", DocumentTarget.VALUESET,
-							bindingId));
+			for (Document constraintDoc : constrintsDocList) {
+				NodeList valueSetAssertions = constraintDoc.getElementsByTagName("ValueSet");
+				for (int i = 0; i < valueSetAssertions.getLength(); i++) {
+					Element valueSetAssertionElm = (Element) valueSetAssertions.item(i);
+					String bindingId = valueSetAssertionElm.getAttribute("ValueSetID");
+					if (bindingId != null && !bindingId.equals("") && !valueSetMap.containsKey(bindingId)) {
+						report.addProfileError(new CustomProfileError(ErrorType.MissingValueSet,
+								"ValueSet " + bindingId + " is missing for Constraints.", DocumentTarget.VALUESET,
+								bindingId));
+					}
 				}
 			}
+			
 
 		} catch (SAXException e) {
 			report.addProfileError(new CustomProfileError(ErrorType.Unknown, e.getMessage(), null, null));
@@ -219,10 +239,10 @@ public class ValidationServiceImpl implements ValidationService {
 			;
 		}
 
-		// 5. Pasing by core
+		// 5. Parsing by core
 
 		if (report.isSuccess()) {
-			InputStream profileXMLIO = IOUtils.toInputStream(profileXMLStr, StandardCharsets.UTF_8);
+			InputStream profileXMLIO = IOUtils.toInputStream(profileXML, StandardCharsets.UTF_8);
 			try {
 				XMLDeserializer.deserialize(profileXMLIO).get();
 			} catch (Error error) {
@@ -241,13 +261,18 @@ public class ValidationServiceImpl implements ValidationService {
 		}
 
 		return report;
+
 	}
+	
+	
+	
 	
 	@Override
 	public ProfileValidationReport validationXMLs(String profileXMLStr, String constraintXMLStr, String valuesetXMLStr) {
 		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr, null, null, null);
 	}
 	
+	//this one 
 	@Override
 	public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO,
 			InputStream valuesetXMLIO, InputStream coconstraintXMLIO, InputStream pofileSlicingXMLIO,
@@ -267,6 +292,11 @@ public class ValidationServiceImpl implements ValidationService {
 
 		return this.validationXMLs(profileXMLStr, constraintXMLStr, valuesetXMLStr, coconstraintXMLStr, pofileSlicingXMLStr, bindingXMLStr);
 	}
+	
+
+	
+	
+	
 	
 	@Override
 	public ProfileValidationReport validationXMLs(InputStream profileXMLIO, InputStream constraintXMLIO,

@@ -18,12 +18,12 @@
 		<dependency>
 			<groupId>gov.nist</groupId>
 			<artifactId>hl7-v2-validation</artifactId>
-			<version>1.6.7</version>
+			<version>1.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.nist.hit</groupId>
 			<artifactId>hl7-v2-schemas</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.1</version>
 		</dependency>
 
 		<dependency>
