@@ -173,6 +173,11 @@ public class ValidationServiceImpl implements ValidationService {
 				Element v = (Element) valueSetDefinitions.item(i);
 				valueSetMap.put(v.getAttribute("BindingIdentifier"), v);
 			}
+			NodeList externalValueSetDefinitions = valuesetsDoc.getElementsByTagName("ExternalValueSetDefinition");
+			for (int i = 0; i < externalValueSetDefinitions.getLength(); i++) {
+				Element v = (Element) externalValueSetDefinitions.item(i);
+				valueSetMap.put(v.getAttribute("BindingIdentifier"), v);
+			}
 
 			for (String id : segmentMap.keySet()) {
 				Element segElm = segmentMap.get(id);
